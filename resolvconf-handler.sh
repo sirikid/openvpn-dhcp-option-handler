@@ -15,10 +15,10 @@ case $script_type in
                     echo search "${!var:19}"
                     ;;
             esac
-        done | resolvconf -a "$dev"
+        done | /sbin/resolvconf -a "$dev"
         ;;
 
     (down)
-        resolvconf -d "$dev"
+        /sbin/resolvconf -d "$dev"
         ;;
 esac
