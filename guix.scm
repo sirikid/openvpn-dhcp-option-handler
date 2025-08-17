@@ -1,9 +1,11 @@
 (use-modules
- (guix packages)
+ (guix build-system copy)
  (guix gexp)
  (guix git-download)
- (guix build-system copy)
- ((gnu packages dns) #:select (openresolv)))
+ (guix packages)
+ ((guix licenses) #:prefix licenses:)
+ ((gnu packages dns) #:select (openresolv))
+ ((gnu packages linux) #:select (util-linux)))
 
 (package
   (name "openvpn-dhcp-option-handler")
@@ -11,7 +13,7 @@
   (source (let ((dir (dirname (current-filename))))
             (local-file dir #:recursive? #t #:select? (git-predicate dir))))
   (build-system copy-build-system)
-  (inputs (list openresolv))
+  (inputs (list openresolv util-linux))
   (arguments
    '(#:install-plan '(("resolvconf-handler.sh" "bin/"))
      #:phases
@@ -19,9 +21,9 @@
        (add-before 'install 'patch-resolvconf
          (lambda* (#:key inputs #:allow-other-keys)
            (substitute* "resolvconf-handler.sh"
-             (("/sbin/resolvconf" path)
-              (string-append (assoc-ref inputs "openresolv") path))))))))
-  (home-page #f)
-  (synopsis #f)
+             (("/bin/getopt|/sbin/resolvconf" path)
+              (search-input-file inputs path))))))))
+  (home-page "https://github.com/sirikid/openvpn-dhcp-option-handler")
+  (synopsis "Script to handle DHCP options pushed from OpenVPN server")
   (description #f)
-  (license #f))
+  (license licenses:asl2.0))
